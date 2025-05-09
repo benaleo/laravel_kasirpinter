@@ -30,7 +30,7 @@ const mainNavGroups: NavGroup[] = [
         items: [
             {
                 title: 'Dashboard',
-                href: '/dashboard',
+                href: '/v1/dashboard',
                 icon: LayoutGrid
             }
         ]
