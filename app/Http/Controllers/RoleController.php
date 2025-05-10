@@ -7,12 +7,13 @@ use App\Models\Role;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class RoleController extends Controller
 {
     public function index()
     {
-        return Role::with('permissions')->get();
+        return Inertia::render('Admin/Roles/Index');
     }
 
     public function store(RoleRequest $request)
