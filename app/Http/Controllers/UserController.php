@@ -9,7 +9,23 @@ class UserController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Users/Index');
+        $users = \App\Models\User::query()
+            ->when(request('search'), function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->when(request('sort'), function ($query, $sort) {
+                $direction = request('direction', 'asc');
+                $query->orderBy($sort, $direction);
+            })
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+        ]);
     }
 
     public function create()
