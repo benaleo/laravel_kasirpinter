@@ -8,10 +8,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('roles', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
+            $table->uuid('secure_id')->unique()->default(DB::raw('gen_random_uuid()'));
             $table->string('name');
-            $table->foreignId('updated_by')->constrained('users');
-            $table->foreignId('created_by')->constrained('users');
+            $table->string('updated_by')->nullable();;
             $table->timestamps();
             $table->softDeletes();
         });

@@ -80,13 +80,13 @@ return [
     | Session Database Table
     |--------------------------------------------------------------------------
     |
-    | When using the "database" session driver, you may specify the table to
-    | be used to store sessions. Of course, a sensible default is defined
-    | for you; however, you're welcome to change this to another table.
+    | When using the "database" session driver, you may specify the table we
+    | should use to manage the sessions. Of course, a sensible default is
+    | provided for you; however, you are free to change this as needed.
     |
     */
 
-    'table' => env('SESSION_TABLE', 'sessions'),
+    'table' => 'sessions',
 
     /*
     |--------------------------------------------------------------------------
@@ -214,4 +214,6 @@ return [
 
     'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
 
+    // Add this setting
+    'serialize_precision' => -1,
 ];

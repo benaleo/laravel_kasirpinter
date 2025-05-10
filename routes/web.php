@@ -13,9 +13,11 @@ Route::prefix('v1')->middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function (){return Inertia::render('Dashboard');})->name('dashboard');;
 
     // Users routes
-    Route::resource('users', \App\Http\Controllers\UserController::class);
+    Route::get('users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+    Route::resource('users', \App\Http\Controllers\UserController::class)->except('index');
 
     // Roles routes
+    Route::get('roles', [\App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
     Route::resource('roles', \App\Http\Controllers\RoleController::class);
 });
 
