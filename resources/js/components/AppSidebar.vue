@@ -104,12 +104,12 @@ const mainNavGroups: NavGroup[] = [
         items: [
             {
                 title: 'User',
-                href: '/users',
+                href: route('users.index'),
                 icon: LayoutGrid
             },
             {
                 title: 'Role',
-                href: '/roles',
+                href: route('roles.index'),
                 icon: LayoutGrid
             }
 
