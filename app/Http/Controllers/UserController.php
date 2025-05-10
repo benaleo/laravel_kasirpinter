@@ -4,20 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\User;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = \App\Models\User::query()
-            ->when(request('search'), function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->when(request('sort'), function ($query, $sort) {
-                $direction = request('direction', 'asc');
+        $query = User::query();
+
+        if ($request->filled('keyword')) {
+            $keyword = strtolower($request->keyword);
+            $query->where(function ($query) use ($keyword) {
+                $query->whereRaw("LOWER(name) LIKE ?", ['%' . $keyword . '%'])
+                    ->orWhereRaw("LOWER(email) LIKE ?", ['%' . $keyword . '%']);
+            });
+        }
+
+        $users = $query
+            ->when($request->sort, function ($query, $sort) {
+                $direction = $request->direction ?? 'asc';
                 $query->orderBy($sort, $direction);
             })
             ->paginate(10)

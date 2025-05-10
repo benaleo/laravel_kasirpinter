@@ -34,13 +34,29 @@ import {
   FlexRender,
 } from '@tanstack/vue-table'
 import { ChevronDown, ChevronsUpDown } from 'lucide-vue-next'
-import { h, ref } from 'vue'
+import { h, ref, watch } from 'vue'
 
 const props = defineProps<{
   data: any[]
   columns: any[]
-  actions?: any[]
+  actions?: {
+    id: string;
+    label: string;
+    handler: (row: any) => void;
+  }[]
+  keyword?: string
+  searchableColumns?: string[]
 }>()
+
+const emit = defineEmits<{
+  (e: 'update:keyword', value: string): void
+}>()
+
+const data = ref(props.data)
+
+watch(() => props.data, (newData) => {
+  data.value = newData
+}, { deep: true })
 
 const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
@@ -49,11 +65,9 @@ const rowSelection = ref({})
 const expanded = ref<ExpandedState>({})
 
 const table = useVueTable({
-  data: props.data,
+  data,
   columns: props.columns,
   getCoreRowModel: getCoreRowModel(),
-  getPaginationRowModel: getPaginationRowModel(),
-  getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
   getExpandedRowModel: getExpandedRowModel(),
   onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
@@ -62,12 +76,11 @@ const table = useVueTable({
   onRowSelectionChange: updaterOrValue => valueUpdater(updaterOrValue, rowSelection),
   onExpandedChange: updaterOrValue => valueUpdater(updaterOrValue, expanded),
   state: {
-    get sorting() { return sorting.value },
-    get columnFilters() { return columnFilters.value },
-    get columnVisibility() { return columnVisibility.value },
     get rowSelection() { return rowSelection.value },
     get expanded() { return expanded.value },
   },
+  manualFiltering: false,
+  getFilteredRowModel: getFilteredRowModel()
 })
 </script>
 
@@ -75,18 +88,11 @@ const table = useVueTable({
   <div class="w-full">
     <div class="flex gap-2 items-center py-4">
       <Input
-        v-if="table.getColumn('name')"
+        v-if="props.searchableColumns?.length"
         class="max-w-sm"
-        placeholder="Search by name..."
-        :model-value="table.getColumn('name')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
-      />
-      <Input
-        v-if="table.getColumn('email')"
-        class="max-w-sm"
-        placeholder="Search by email..."
-        :model-value="table.getColumn('email')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('email')?.setFilterValue($event)"
+        placeholder="Search..."
+        :model-value="props.keyword"
+        @update:model-value="(value) => $emit('update:keyword', value)"
       />
       <DropdownMenu v-if="table.getAllColumns().length > 0">
         <DropdownMenuTrigger as-child>
@@ -153,15 +159,15 @@ const table = useVueTable({
               <TableRow v-if="row.getIsExpanded() && actions">
                 <TableCell :colspan="row.getAllCells().length">
                   <div class="flex gap-2">
-                    <Button
-                      v-for="action in actions"
-                      :key="action.id"
-                      variant="outline"
-                      size="sm"
-                      @click="action.handler(row.original)"
-                    >
-                      {{ action.label }}
-                    </Button>
+                    <template v-for="action in props.actions" :key="action.id">
+                      <button
+                        class="text-sm text-blue-500 hover:text-blue-700"
+                        :class="action.id === 'delete' ? 'text-red-500 hover:text-red-700' : 'text-blue-500 hover:text-blue-700'"
+                        @click="() => action.handler(row.original)"
+                      >
+                        {{ action.label }}
+                      </button>
+                    </template>
                   </div>
                 </TableCell>
               </TableRow>

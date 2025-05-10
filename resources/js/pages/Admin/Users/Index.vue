@@ -4,6 +4,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
+import { ref, watch, computed } from 'vue';
 import DataTable from '@/components/ui/data-table/DataTable.vue';
 import { createColumnHelper } from '@tanstack/vue-table';
 import { h } from 'vue';
@@ -16,6 +17,25 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const columnHelper = createColumnHelper<any>();
+
+const actions = [
+    {
+        id: 'edit',
+        label: 'Edit',
+        handler: (row) => {
+            router.get(`/v1/admin/users/${row.id}/edit`)
+        }
+    },
+    {
+        id: 'delete',
+        label: 'Delete',
+        handler: (row) => {
+            if (confirm('Are you sure you want to delete this user?')) {
+                router.delete(`/v1/admin/users/${row.id}`)
+            }
+        }
+    }
+];
 
 const columns = [
     columnHelper.accessor('name', {
@@ -65,7 +85,30 @@ const columns = [
     }),
 ];
 
-const data = usePage().props.users.data;
+const keyword = ref('');
+
+const debounce = (fn, delay) => {
+    let timeoutId;
+    return (...args) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => fn(...args), delay);
+    };
+};
+
+const updateKeyword = debounce((newKeyword) => {
+    keyword.value = newKeyword;
+    router.get('/v1/users', {
+        keyword: newKeyword,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true
+    });
+}, 1000);
+
+const users = computed(() => usePage().props.users.data);
 </script>
 
 <template>
@@ -73,7 +116,14 @@ const data = usePage().props.users.data;
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <DataTable :data="data" :columns="columns" />
+            <DataTable
+      :data="users"
+      :columns="columns"
+      :actions="actions"
+      :keyword="keyword"
+      :searchable-columns="['name', 'email']"
+      @update:keyword="updateKeyword"
+    />
         </div>
     </AppLayout>
 </template>
