@@ -41,59 +41,17 @@ const mainNavGroups: NavGroup[] = [
         items: [
             {
                 title: 'Transaksi',
-                href: '/transactions',
+                href: route('transactions.index'),
                 icon: LayoutGrid
             },
             {
                 title: 'Produk',
-                href: '/products',
+                href: route('products.index'),
                 icon: LayoutGrid
             },
             {
                 title: 'Kategori Produk',
-                href: '/product-categories',
-                icon: LayoutGrid
-            }
-        ]
-    },
-    {
-        title: 'Karyawan',
-        icon: LayoutGrid,
-        items: [
-            {
-                title: 'Perusahaan',
-                href: '/companies',
-                icon: LayoutGrid
-            },
-            {
-                title: 'Kategori Perusahaan',
-                href: '/company-categories',
-                icon: LayoutGrid
-            },
-            {
-                title: 'Karyawan',
-                href: '/employees',
-                icon: LayoutGrid
-            },
-            {
-                title: 'Shift',
-                href: '/shifts',
-                icon: LayoutGrid
-            },
-            {
-                title: 'Posisi Jabatan',
-                href: '/job-positions',
-                icon: LayoutGrid
-            }
-        ]
-    },
-    {
-        title: 'Laporan',
-        icon: LayoutGrid,
-        items: [
-            {
-                title: 'Lapor Pajak',
-                href: '/report-tax',
+                href: route('product-categories.index'),
                 icon: LayoutGrid
             }
         ]
